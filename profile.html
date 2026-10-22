@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Profile | SubscriptionBD</title><link rel="stylesheet" href="styles.css">
+<style>
+:root{--ink:#09243a;--blue:#1374d9;--line:rgba(19,116,217,.18)}*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(135deg,#eef9ff,#fff 45%,#dff3ff);color:var(--ink);min-height:100vh}.wrap{max-width:900px;margin:auto;padding:24px 18px}.card{background:#ffffffdc;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 20px 60px #1374d91a}.field{display:grid;gap:6px;margin:14px 0}input{font:inherit;padding:12px;border:1px solid #bfd8e8;border-radius:10px;width:100%}button,.link{border:0;border-radius:10px;padding:12px 16px;background:#1374d9;color:white;font:inherit;cursor:pointer;text-decoration:none;display:inline-block}.secondary{background:#e6f5ff;color:#09243a}.avatar{width:92px;height:92px;border-radius:50%;object-fit:cover;background:#e6f5ff;border:2px solid #b9e5ff}#status{color:#557085;white-space:pre-wrap}
+</style></head><body><main class="wrap"><p><a class="link secondary" href="index.html">← Home</a> <a class="link secondary" href="orders.html">My orders</a></p>
+<section class="card"><h1>My profile</h1><p>Manage your SubscriptionBD account details.</p><p id="status">Checking sign-in…</p>
+<div id="profile" hidden><img id="avatar" class="avatar" alt="Profile picture"><div class="field"><label for="photo">Profile picture</label><input id="photo" type="file" accept="image/*"></div>
+<div class="field"><label for="displayName">Username / display name</label><input id="displayName" maxlength="40" placeholder="Your name"></div>
+<div class="field"><label for="email">Email</label><input id="email" disabled></div><button id="save">Save profile</button> <button id="logout" class="secondary">Log out</button></div>
+<p><a class="link" href="login.html">Sign in with Google</a></p></section></main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script><script src="firebase-config.js"></script>
+<script>
+(function(){if(!window.SUBSCRIPTIONBD_FIREBASE_CONFIG){document.getElementById('status').textContent='Firebase configuration missing.';return}
+firebase.initializeApp(window.SUBSCRIPTIONBD_FIREBASE_CONFIG);const auth=firebase.auth(),db=firebase.firestore(),storage=firebase.storage();
+const $=id=>document.getElementById(id);let current=null,photoURL='';
+auth.onAuthStateChanged(async user=>{current=user;if(!user){$('status').textContent='You are not signed in. Use the Google sign-in button.';$('profile').hidden=true;return}
+$('profile').hidden=false;$('status').textContent='Signed in';$('email').value=user.email||'';photoURL=user.photoURL||'';$('avatar').src=photoURL||'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100%" height="100%" fill="#e6f5ff"/><text x="50%" y="58%" text-anchor="middle" font-size="38">👤</text></svg>');
+try{const snap=await db.collection('users').doc(user.uid).get();const data=snap.exists?snap.data():{};$('displayName').value=data.displayName||user.displayName||'';photoURL=data.photoURL||photoURL;if(photoURL)$('avatar').src=photoURL;}catch(e){$('status').textContent='Could not load profile: '+e.message+'\nCheck Firestore Rules.'}
+});
+$('photo').addEventListener('change',e=>{const f=e.target.files[0];if(f){if(f.size>5*1024*1024){alert('Please choose an image smaller than 5 MB.');e.target.value='';return}$('avatar').src=URL.createObjectURL(f)}});
+$('save').addEventListener('click',async()=>{if(!current)return;const name=$('displayName').value.trim();if(!name){alert('Please enter a display name.');return}const file=$('photo').files[0];$('status').textContent='Saving…';try{if(file){const ref=storage.ref('profilePictures/'+current.uid+'/'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'_'));const snap=await ref.put(file);photoURL=await snap.ref.getDownloadURL()}await db.collection('users').doc(current.uid).set({uid:current.uid,email:current.email||'',displayName:name,photoURL,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});await current.updateProfile({displayName:name,photoURL:photoURL||null});localStorage.setItem('zest_current_user',JSON.stringify({uid:current.uid,email:current.email||'',username:name,photoURL,provider:'google'}));$('status').textContent='Profile saved.';}catch(e){$('status').textContent='Save failed: '+e.message+'\nCheck Firestore and Storage Rules.'}});
+$('logout').addEventListener('click',()=>auth.signOut().then(()=>location.href='index.html'));
+})();
+</script></body></html>

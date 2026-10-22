@@ -1,0 +1,52 @@
+SUBSCRIPTIONBD — GOOGLE LOGIN + PROFILE SETUP
+==============================================
+
+WHAT'S INCLUDED
+- Existing website files preserved in this separate ZIP copy.
+- Google sign-in button added to login.html.
+- profile.html lets signed-in users edit display name and upload a profile photo.
+- firebase-config.js uses the web config you supplied.
+- Firestore and Storage rule templates are included.
+
+IMPORTANT LIMITATIONS
+- This is a static-site integration. Existing legacy email/password login and localStorage orders are retained and are NOT automatically converted to Firebase accounts/orders.
+- Cloud order management and customer/admin order dashboards still require connecting the checkout/order-creation flow to Firestore and protecting admin access. Do not advertise this as complete until that work is implemented and tested.
+- Product review UI has not yet been inserted into every product page; firestore rules include a review collection policy template only.
+- Never enable public read/write rules.
+- Firebase web config is public-facing; security must come from rules, not hiding this file.
+
+STEP 1 — Upload files
+1. Make a backup of your currently published website first.
+2. Extract this ZIP.
+3. Upload the CONTENTS of the `subscriptionbd` folder to the website root for subscriptionbd.shop, preserving the existing directory structure and images.
+4. Do not delete files on your hosting that aren't present in this ZIP.
+
+STEP 2 — Enable the domain for Google auth
+Firebase Console > Authentication > Settings > Authorized domains > Add domain:
+subscriptionbd.shop
+Also add www.subscriptionbd.shop if you use that hostname.
+Google sign-in requires HTTPS on the live site. Test from the deployed domain, not by opening the HTML file from your computer.
+
+STEP 3 — Firestore rules
+Firebase Console > Build > Firestore Database > Rules.
+Only after reviewing, replace current rules with the contents of firestore.rules.txt and click Publish.
+These rules allow user-owned profile docs at users/{uid}, owner-scoped orders at orders/{orderId}, and public read / owner write reviews at reviews/{reviewId}. They are a starting policy, not a completed admin system.
+Important: the current website's old order workflow does not yet write orders to Firestore, so these rules alone do not make orders cloud-based.
+
+STEP 4 — Storage rules for profile photos
+Firebase Console > Build > Storage > Get started (if Storage is not set up) > Rules.
+Use storage.rules.txt and publish. Storage may require enabling billing depending on current Firebase plan/product availability; if Firebase asks for billing, stop and check the plan before proceeding.
+
+STEP 5 — Test Google login
+1. Visit https://subscriptionbd.shop/login.html
+2. Click “Continue with Google”.
+3. Approve Google sign-in.
+4. You should be redirected to profile.html.
+5. Edit display name and upload a small image, then Save profile.
+If the browser reports unauthorized-domain, recheck Step 2. If permission-denied appears, confirm rules were published.
+
+BEFORE PRODUCTION
+- Test in a backup/staging folder first.
+- Confirm HTTPS is active.
+- Keep an admin-only role controlled securely; never trust a role value customers can edit themselves.
+- Do not paste service account keys into website files.
