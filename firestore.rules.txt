@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each customer can read/write only their own profile.
+    match /users/{userId} {
+      allow read, create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+    // Orders are private to the signed-in customer who owns them.
+    match /orders/{orderId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid
+                    && request.resource.data.uid == request.auth.uid;
+      allow delete: if false;
+    }
+    // Published product reviews are visible to everyone; only the author can create/update/delete their own.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.rating is int
+                    && request.resource.data.rating >= 1
+                    && request.resource.data.rating <= 5;
+      allow update, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+  }
+}
