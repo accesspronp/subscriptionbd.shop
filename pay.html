@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Payment — AccesProNp</title>
+  <meta name="description" content="Pay via eSewa and place your order." />
+
+  <style>
+    :root{
+      --bg:#070A12;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.04);
+      --text:#ECF2FF;
+      --muted:#A9B5D6;
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+
+      --a1:#7C3AED;
+      --a2:#22D3EE;
+      --a3:#10B981;
+
+      --r:18px;
+      --btn: linear-gradient(135deg, var(--a1), var(--a2));
+      --btn2: rgba(255,255,255,.08);
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 600px at 15% 10%, rgba(124,58,237,.35), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(34,211,238,.22), transparent 55%),
+        radial-gradient(900px 500px at 70% 100%, rgba(16,185,129,.14), transparent 55%),
+        var(--bg);
+      overflow-x:hidden;
+    }
+
+    a{color:inherit;text-decoration:none}
+    .container{width:min(1120px, 92vw); margin:0 auto}
+
+    .header{
+      position:sticky; top:0; z-index:50;
+      background: rgba(7,10,18,.55);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-row{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0; gap:12px;
+    }
+    .brand img{
+      width:46px; height:46px; object-fit:contain;
+      border-radius:14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .nav{display:flex; align-items:center; gap:16px}
+    .nav a{color: var(--muted)}
+    .nav a:hover{color: var(--text)}
+    @media (max-width: 900px){ .nav{display:none} }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:11px 14px;
+      border-radius:14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: var(--btn);
+      color:#071022;
+      font-weight:800;
+      box-shadow: var(--shadow);
+      transition: transform .18s ease, filter .18s ease;
+      cursor:pointer;
+      will-change: transform;
+    }
+    .btn:hover{transform: translateY(-2px); filter:brightness(1.05)}
+    .btn:active{transform: translateY(0px) scale(.99)}
+    .btn-ghost{background: var(--btn2); color: var(--text); box-shadow:none}
+    .btn-block{width:100%}
+    .btn-small{padding:8px 10px; border-radius:12px; font-weight:750}
+
+    .card{
+      background: linear-gradient(180deg, var(--panel), var(--panel2));
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding:16px;
+      box-shadow: var(--shadow);
+    }
+
+    .section{padding:38px 0}
+    h1{margin:0 0 8px 0; font-size:34px; letter-spacing:-.01em}
+    h2{margin:0 0 10px 0; font-size:22px}
+    .muted{color:var(--muted)}
+    .tiny{font-size:12px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+
+    .two-col{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 900px){.two-col{grid-template-columns:1fr}}
+
+    form{display:grid; gap:12px; margin-top:12px}
+    label{display:grid; gap:6px; font-weight:700}
+
+    input,textarea,select{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+    }
+    input:focus,textarea:focus,select:focus{border-color: rgba(34,211,238,.55)}
+
+    .pay-box{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      margin:12px 0;
+      background: rgba(255,255,255,.03);
+    }
+    .qr{
+      width:100%;
+      max-width:270px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px; border-radius:999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size:13px;
+    }
+
+    .hint{
+      border-left: 3px solid rgba(34,211,238,.6);
+      padding:10px 12px;
+      border-radius: 12px;
+      background: rgba(34,211,238,.08);
+      color: var(--muted);
+      font-size:13px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="container header-row">
+      <a href="index.html" aria-label="Home" class="brand">
+        <img src="logo.png" alt="AccesProNp Logo" />
+      </a>
+
+      <nav class="nav">
+        <a href="index.html#pricing">Pricing</a>
+        <a href="index.html#how">How it works</a>
+      </nav>
+
+      <a class="btn" target="_blank"
+         href="https://wa.me/9779744452908?text=Hi%20AccesProNp%2C%20I%20want%20to%20order.">
+        WhatsApp
+      </a>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container two-col">
+      <section class="card">
+        <h1>Payment / Order</h1>
+        <p class="muted" style="margin:0;">
+          Select product + plan → then it opens WhatsApp with your order message.
+        </p>
+
+        <div class="hint" style="margin-top:12px;">
+          Website can’t auto-send images to WhatsApp. After WhatsApp opens, <b>attach your screenshot</b> in chat.
+        </div>
+
+        <form id="orderForm">
+          <label>
+            Your Name
+            <input required name="name" placeholder="Your name" />
+          </label>
+
+          <label>
+            Product
+            <select required name="product" id="product"></select>
+          </label>
+
+          <label>
+            Plan
+            <select required name="plan" id="plan"></select>
+          </label>
+
+          <label>
+            Gmail / Email (for activation)
+            <input name="email" type="email" placeholder="yourmail@gmail.com" />
+          </label>
+
+          <label>
+            Your WhatsApp Number
+            <input name="phone" placeholder="98XXXXXXXX" />
+          </label>
+
+          <label>
+            Payment Screenshot (choose file)
+            <input name="proof" id="proof" type="file" accept="image/*" />
+          </label>
+          <div class="tiny muted" id="proofName">No file selected.</div>
+
+          <label>
+            Notes (optional)
+            <textarea name="notes" rows="3" placeholder="Any extra info..."></textarea>
+          </label>
+
+          <button class="btn btn-block" type="submit">Send Order on WhatsApp</button>
+        </form>
+      </section>
+
+      <aside class="card">
+        <h2>Pay via eSewa</h2>
+        <p class="muted" style="margin:0 0 10px 0;">
+          Pay to the number below and take screenshot.
+        </p>
+
+        <div class="row">
+          <span class="chip">WhatsApp: <span class="mono">9744452908</span></span>
+          <span class="chip">eSewa: <span class="mono">9812766213</span></span>
+        </div>
+
+        <div class="pay-box">
+          <div class="row">
+            <div>
+              <div class="muted tiny">eSewa Number</div>
+              <div class="mono" style="font-size:20px; font-weight:900;">9812766213</div>
+            </div>
+            <button class="btn btn-small btn-ghost" id="copyEsewa" type="button">Copy</button>
+          </div>
+        </div>
+
+        <div class="pay-box">
+          <div style="font-weight:900; margin-bottom:6px;">eSewa QR</div>
+          <div class="muted tiny" style="margin-bottom:10px;">
+            Upload QR image as <span class="mono">esewa-qr.png</span> (same folder)
+          </div>
+          <img class="qr" src="esewa-qr.png" alt="eSewa QR code" />
+        </div>
+
+        <p class="tiny muted" style="margin:0;">
+          Safety: Never share OTP/passwords.
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    // Products + plans
+    const PLANS = {
+      "Netflix": [
+        "1 Month - Rs. 299",
+        "2 Months - Rs. 549",
+        "3 Months - Rs. 849",
+        "6 Months - Rs. 1549",
+        "9 Months - Rs. 2199",
+        "1 Year - Rs. 2699"
+      ],
+      "Spotify Premium": [
+        "3 Months - Rs. 899",
+        "6 Months - Rs. 1,599",
+        "1 Year - Rs. 2,299"
+      ],
+      "YouTube Premium": [
+        "1 Month - Rs. 199",
+        "3 Months - Rs. 499",
+        "6 Months - Rs. 899",
+        "1 Year - Rs. 1549"
+      ],
+      "Apple TV+": [
+        "1 Month - Rs. 329",
+        "3 Months - Rs. 849",
+        "6 Months - Rs. 1649",
+        "1 Year - Rs. 3049"
+      ],
+      "ChatGPT Plus": [
+        "1 Month - Rs. 349",
+        "2 Months - Rs. 599",
+        "3 Months - Rs. 749",
+        "6 Months - Rs. 1349",
+        "1 Year - Rs. 2849"
+      ],
+      "Prime Video": [
+        "Ask on WhatsApp (pricing may change)"
+      ]
+    };
+
+    const productEl = document.getElementById("product");
+    const planEl = document.getElementById("plan");
+
+    function fillProducts(selected){
+      productEl.innerHTML = "";
+      Object.keys(PLANS).forEach(name => {
+        const opt = document.createElement("option");
+        opt.value = name;
+        opt.textContent = name;
+        if (selected && selected === name) opt.selected = true;
+        productEl.appendChild(opt);
+      });
+    }
+
+    function fillPlans(product, selectedPlan){
+      planEl.innerHTML = "";
+      (PLANS[product] || []).forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        if (selectedPlan && selectedPlan === p) opt.selected = true;
+        planEl.appendChild(opt);
+      });
+    }
+
+    // Prefill from URL
+    const params = new URLSearchParams(location.search);
+    const qProduct = params.get("product");
+    const qPlan = params.get("plan");
+
+    fillProducts(qProduct || "Netflix");
+    fillPlans(productEl.value, qPlan || "");
+
+    productEl.addEventListener("change", () => {
+      fillPlans(productEl.value, "");
+    });
+
+    // Screenshot filename display
+    const proof = document.getElementById("proof");
+    const proofName = document.getElementById("proofName");
+    proof.addEventListener("change", () => {
+      proofName.textContent = proof.files && proof.files[0]
+        ? ("Selected: " + proof.files[0].name)
+        : "No file selected.";
+    });
+
+    // Copy eSewa
+    document.getElementById("copyEsewa").addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText("9812766213");
+        const btn = document.getElementById("copyEsewa");
+        btn.textContent = "Copied!";
+        setTimeout(()=>btn.textContent="Copy", 1100);
+      }catch{
+        alert("eSewa: 9812766213");
+      }
+    });
+
+    // Submit -> WhatsApp message
+    document.getElementById("orderForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+
+      const name = fd.get("name") || "";
+      const product = fd.get("product") || "";
+      const plan = fd.get("plan") || "";
+      const email = fd.get("email") || "";
+      const phone = fd.get("phone") || "";
+      const notes = fd.get("notes") || "";
+      const proofFile = (proof.files && proof.files[0]) ? proof.files[0].name : "Not selected";
+
+      const msg =
+`Hi AccesProNp! I want to order:
+Name: ${name}
+Product: ${product}
+Plan: ${plan}
+Email: ${email}
+My WhatsApp: ${phone}
+
+Payment: eSewa
+Paid to: 9812766213
+Screenshot file: ${proofFile}
+
+Notes: ${notes}
+
+I will attach the screenshot in WhatsApp now.`;
+
+      const url = "https://wa.me/9779744452908?text=" + encodeURIComponent(msg);
+      window.open(url, "_blank");
+    });
+  </script>
+</body>
+</html>
